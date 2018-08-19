@@ -7,24 +7,42 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>게시판만들기</title>
     <link rel="shortcut icon" type="image⁄x-icon" href="images/board.png">
-    <script
-  src="https://code.jquery.com/jquery-3.3.1.js"
-  integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-  crossorigin="anonymous"></script>
-    <!-- 합쳐지고 최소화된 최신 CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 
-    <!-- 부가적인 테마 -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-    <!-- 합쳐지고 최소화된 최신 자바스크립트 -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<!-- Popper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+<style>
+section{
+    margin-top: 50px;
+}
+.btn-area{
+    margin-bottom:10px;
+}
+.selectBox{
+    float:left;
+}
+</style>
 </head>
 <?php
-
+require "pageMaker.php";
+require "page.php";
 require "boardDAO.php";
+
+$cri = new Criteria();
 $boardDAO = new BoardDAO();
-$list = $boardDAO->getBoardListAll();
+if (isset($_GET["page"])) {
+    $cri->setPage($_GET["page"]);
+}
+$pageMaker = new PageMaker($cri, $boardDAO->getBoardCnt());
+$list = $boardDAO->getBoardList($cri);
+
 ?>
 <body>
     <div class="container">
@@ -36,11 +54,13 @@ $list = $boardDAO->getBoardListAll();
             <table class="table">
                 <colgroup>
                 <col width="10%">
+                <col width="10%">
                 <col width="40%">
                 <col width="20%">
                 <col width="10%">
                 </colgroup>
                 <tr>
+                    <th class='text-center'>번호</th>
                     <th class='text-center'>작성자</th>
                     <th class='text-center'>제목</th>
                     <th>작성일</th>
@@ -48,12 +68,14 @@ $list = $boardDAO->getBoardListAll();
                 </tr>
                 <?php
 foreach ($list as $vo) {
-    $date=date('m-d H:i', strtotime($vo['regdate']));
+    $bno = $vo["bno"];
+    $date = date('m-d H:i', strtotime($vo['regdate']));
     $writer = $vo['writer'];
     $title = $vo['title'];
     $viewcnt = $vo['viewcnt'];
     ?>
                 <tr>
+                    <td><?=$bno?></td>
                     <td><?=$writer?></td>
                     <td><a class="titleLink" href=<?=$vo['bno']?>><?=$title?></a></td>
                     <td><?=$date?></td>
@@ -63,59 +85,95 @@ foreach ($list as $vo) {
 }
 ?>
             </table>
+
+            <!-- 글쓰기버튼 -->
             <div class="btn-area text-right">
-                <button type="button" class="btn btn-primary writeBtn">글쓰기</button>
+                <div class="selectBox">
+
+                    <select name="" id="">
+                        <option value="">전체기간</option>
+                        <option value="">1일</option>
+                        <option value="">1주</option>
+                        <option value="">1개월</option>
+                        <option value="">6개월</option>
+                        <option value="">1년</option>
+                    </select>
+                    <select name="" id="">
+                        <option value="">제목+내용</option>
+                        <option value="">제목</option>
+                        <option value="">작성자</option>
+                    </select>
+                    <input type="text" name="" id="">
+                    <button class="btn btn-primary searchBtn">검색</button>
+                </div>
+            <button type="button" class="btn btn-success writeBtn">글쓰기</button>
             </div>
+
+
+            <!-- 페이지네이션 시작 -->
             <nav class="text-center">
-                <ul class="pagination">
-                    <li>
-                        <a href="#" aria-label="Previous">
-                            <span aria-hidden="true">&laquo;</span>
+            <ul class="pagination justify-content-center">
+                <?php
+if ($pageMaker->prev) {
+    ?>
+                    <li class="page-item">
+                        <a class="page-link" href=<?=$pageMaker->startPage - 1?> aria-label="Previous">
+                            &laquo;
                         </a>
                     </li>
-                    <li>
-                        <a href="#">1</a>
-                    </li>
-                    <li>
-                        <a href="#">2</a>
-                    </li>
-                    <li>
-                        <a href="#">3</a>
-                    </li>
-                    <li>
-                        <a href="#">4</a>
-                    </li>
-                    <li>
-                        <a href="#">5</a>
-                    </li>
-                    <li>
-                        <a href="#" aria-label="Next">
-                            <span aria-hidden="true">&raquo;</span>
+                <?php
+}
+for ($i = $pageMaker->startPage; $i <= $pageMaker->endPage; $i++) {
+    ?>
+
+                   <li class='<?=$i==$cri->page?'page-item active':'page-item'?>'><a class="page-link" href=<?=$i?>><?=$i?></a></li>
+                   
+<?php
+}
+
+if ($pageMaker->next) {
+    ?>
+                    <li class="page-item">
+                        <a class="page-link" href=<?=$pageMaker->endPage+1?> aria-label="Next">
+                            &raquo;
                         </a>
                     </li>
+<?php
+}
+
+?>
                 </ul>
             </nav>
 
 
         </section>
 
-   
+
 
 
 
     </div>
 <script>
 $(function(){
+    var page = '<?= $cri->page ?>';
     $(".writeBtn").click(function(){
-        location.href = "write.html";
+        location.href = "write.php";
 
     });
 
-    $(".titleLink").click(function (e) { 
+    $(".titleLink").click(function (e) {
         e.preventDefault();
         var bno = $(this).attr("href");
-        location.href = "read.php?bno="+bno;
+        location.href = "read.php?bno="+bno+"&page="+page;
     });
+
+    $(".page-link").click(function (e) { 
+        e.preventDefault();
+        var page = $(this).attr("href");
+        location.href = "list.php?page="+page;
+    });
+
+
 
 
 });

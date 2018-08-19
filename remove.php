@@ -3,6 +3,7 @@
 require "boardDAO.php";
 $dao = new BoardDAO();
 $dao->deleteBoard($_POST["bno"]);
-header("Location:list.php");
+$page = $_POST["page"];
+header("Location:list.php?page=$page");
 
 ?>

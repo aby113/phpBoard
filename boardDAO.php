@@ -3,8 +3,8 @@ define('url', "mysql:host=localhost;dbname=web");
 define('user', "bm");
 define('pw', "bm");
 
-
-class BoardDAO{
+class BoardDAO
+{
 
     // 게시물 전체 가져오기
     public function getBoardListAll(): array
@@ -16,6 +16,25 @@ class BoardDAO{
         return $q->fetchAll();
     }
 
+    // 게시물 부분적으로 가져오기
+    public function getBoardList(&$cri):array
+    {
+        $sql = "SELECT * FROM board ORDER BY bno DESC 
+                LIMIT ?, ?";
+        $stmt = $this->getPrePare($sql);
+        // $stmt->execute(array($cri->getStartPage(), $cri->perPageNum));
+        $stmt->bindValue(1, $cri->getStartPage(), PDO::PARAM_INT);
+        $stmt->bindValue(2, $cri->perPageNum, PDO::PARAM_INT);
+        try{
+            $stmt->execute();         
+        }catch(Exception $e){
+           print $e->getMessage();
+        }
+        
+        return $stmt->fetchAll();
+    }
+
+
     // 게시물입력
     public function insertBoard($title, $writer, $content)
     {
@@ -23,7 +42,7 @@ class BoardDAO{
     (title, writer, content)
     VALUES
     (?,?,?)";
-  
+
         $stmt = $this->getPrePare($sql);
         $stmt->execute(array($title, $writer, $content));
     }
@@ -35,7 +54,7 @@ class BoardDAO{
                 title = ?,
                 content = ?
             WHERE bno = ?";
-        $stmt = $this -> getPrePare($sql);
+        $stmt = $this->getPrePare($sql);
         $stmt->execute(array($title, $content, $bno));
     }
 
@@ -43,11 +62,11 @@ class BoardDAO{
     public function deleteBoard($bno)
     {
         $sql = "DELETE FROM board WHERE bno = ?";
-        $stmt =  $this->getPrePare($sql);
+        $stmt = $this->getPrePare($sql);
         $stmt->execute(array($bno));
     }
     // 게시물가져오기
-    public function getBoard($bno):array
+    public function getBoard($bno): array
     {
         $sql = "SELECT * FROM board WHERE bno = ?";
         $stmt = $this->getPrePare($sql);
@@ -56,8 +75,16 @@ class BoardDAO{
         return $stmt->fetch();
     }
 
+    // 전체 게시물 갯수 가져오기
+    public function getBoardCnt():int
+    {
+        $stmt = $this->getConnection();
+        $result = $stmt->query("SELECT COUNT(*) FROM board");
+        return $result->fetch()['0'];
+    }
+
     // PrePareStatement객체 가져오기
-   public function getPrePare($sql): PDOStatement
+    public function getPrePare($sql): PDOStatement
     {
         try {
             $db = new PDO(url, user, pw);
@@ -65,7 +92,7 @@ class BoardDAO{
         } catch (Exception $e) {
             print $e->getMessage();
         }
-        
+
         return $db->prepare($sql);
     }
 
@@ -82,5 +109,3 @@ class BoardDAO{
         return $db;
     }
 }
-
-?>

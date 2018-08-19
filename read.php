@@ -30,6 +30,7 @@ $vo = $dao->getBoard($_GET["bno"]);
 $title = $vo['title'];
 $content = $vo['content'];
 $writer = $vo['writer'];
+$page = $_GET["page"];
 ?>
 <body>
     <div class="container">
@@ -63,14 +64,15 @@ $writer = $vo['writer'];
 
         <form action="">
             <input type="hidden" name="bno" value=<?=$vo['bno']?>>
+            <input type="hidden" name="page" value=<?=$page?>>
         </form>
     </div>
     <script>
     $(document).ready(function () {
-        
+        var page = '<?= $page ?>';
         $(".listBtn").click(function (e) { 
             e.preventDefault();
-            location.href = "list.php";
+            location.href = "list.php?page="+page;
         });
 
         $(".rmBtn").click(function (e) { 

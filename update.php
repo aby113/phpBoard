@@ -31,6 +31,7 @@
 require "boardDAO.php";
 $dao = new BoardDAO();
 $vo = $dao->getBoard($_GET["bno"]);
+$page = $_GET["page"];
 ?>
 <body>
     <div class="container">
@@ -45,6 +46,7 @@ $vo = $dao->getBoard($_GET["bno"]);
         <section>
             <form action="updateDo.php" method="post">
                 <input type="hidden" name="bno" value=<?=$vo['bno']?>>
+                <input type="hidden" name="page" value=<?=$page?>>
                 <div class="form-group">
                     <label for="">제목</label>
                     <input class="form-control" type="text" name="title" value=<?=$vo['title']?>>
@@ -72,11 +74,11 @@ $vo = $dao->getBoard($_GET["bno"]);
     </div>
 <script>
 $(document).ready(function () {
-    
+    var page = '<?= $page?>';
     
     $(".listBtn").click(function (e) { 
         e.preventDefault();
-        location.href = "list.php";
+        location.href = "list.php?page="+page;
     });
 
 
