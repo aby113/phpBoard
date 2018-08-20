@@ -17,23 +17,123 @@ class BoardDAO
     }
 
     // 게시물 부분적으로 가져오기
-    public function getBoardList(&$cri):array
+    public function getBoardList(&$cri): array
     {
-        $sql = "SELECT * FROM board ORDER BY bno DESC 
+        $sql = "SELECT * FROM board ORDER BY bno DESC
                 LIMIT ?, ?";
         $stmt = $this->getPrePare($sql);
-        // $stmt->execute(array($cri->getStartPage(), $cri->perPageNum));
         $stmt->bindValue(1, $cri->getStartPage(), PDO::PARAM_INT);
         $stmt->bindValue(2, $cri->perPageNum, PDO::PARAM_INT);
-        try{
-            $stmt->execute();         
-        }catch(Exception $e){
-           print $e->getMessage();
+        try {
+            $stmt->execute();
+        } catch (Exception $e) {
+            print $e->getMessage();
         }
-        
+
         return $stmt->fetchAll();
     }
 
+    // 게시물 검색 요청
+    public function getSearchBoard(&$cri): array
+    {
+
+        $searchSql = "SELECT * FROM board ";
+        $startPage = $cri->getStartPage();
+        // 검색조건별로 기간, 제목, 제목+내용, 작성자 쿼리를 만든다
+        $searchSql .= $this->mkPeriodSql($cri->period);
+        if ($cri->keyword && $cri->searchType) { // 검색타입+키워드 둘다 있어야 실행된다.
+            $searchSql .= $this->mkSearchSql($cri->searchType);
+        }
+        $searchSql .= " ORDER BY bno DESC LIMIT :startPage, :perPageNum";
+        $stmt = $this->getPrePare($searchSql);
+
+        if ($cri->keyword) {
+            $stmt->bindParam(":keyword", $cri->keyword, PDO::PARAM_STR);
+        }
+        $stmt->bindParam(":startPage", $startPage, PDO::PARAM_INT);
+        $stmt->bindParam(":perPageNum", $cri->perPageNum, PDO::PARAM_INT);
+        try {
+            $stmt->execute();
+        } catch (Exception $e) {
+            print $e->getMessage();
+        }
+
+        return $stmt->fetchAll();
+    }
+
+    // 전체 게시물 갯수 가져오기
+    public function getBoardCnt(&$cri): int
+    {
+
+        $sql = "SELECT COUNT(*) FROM board ";
+        $sql .= $this->mkPeriodSql($cri->period);
+        if ($cri->keyword && $cri->searchType) { // 검색타입+키워드 둘다 있어야 실행된다.
+            $sql .= $this->mkSearchSql($cri->searchType);
+        }
+        $stmt = $this->getPrePare($sql);
+        if ($cri->keyword) {
+            $stmt->bindParam(":keyword", $cri->keyword, PDO::PARAM_STR);
+        }
+        try {
+            $stmt->execute();
+        } catch (Exception $e) {
+            print $e->getMessage();
+        }
+
+        $result = $stmt->fetch()['0'];
+        return empty($result) ? 0 : $result;
+    }
+
+    // 기간 검색 sql ex) SELECT * FROM board WHERE regdate <= now() AND title LIKE CONCAT('%', 변수, '%');
+    public function mkSearchSql($searchType)
+    {
+        $searchSql = "";
+        switch ($searchType) {
+            case "tc":
+                $searchSql .= "AND (
+                            title LIKE CONCAT('%', :keyword, '%')
+                            OR content LIKE CONCAT('%', :keyword, '%')
+                               )";
+                break;
+            case "t":
+                $searchSql .= "AND title LIKE CONCAT('%', :keyword , '%')";
+                break;
+            case "w":
+                $searchSql .= "AND writer LIKE CONCAT('%', :keyword , '%')";
+                break;
+        }
+        return $searchSql;
+    }
+    // 기간 날짜 설정 sql
+    public function mkPeriodSql($period)
+    {
+        $searchSql = "WHERE ";
+        switch ($period) {
+            case "fd":
+                $searchSql .= "regdate <= now()";
+                break;
+            case "1d";
+                $searchSql .= "regdate >= date_add(now(), interval - 1 day)";
+                break;
+            case "1w";
+                $searchSql .= "regdate >= date_add(now(), interval - 1 week)";
+                break;
+            case "1m";
+                $searchSql .= "regdate >= date_add(now(), interval - 1 month)";
+                break;
+            case "6m";
+                $searchSql .= "regdate >= date_add(now(), interval - 6 month)";
+                break;
+            case "1y";
+                $searchSql .= "regdate >= date_add(now(), interval - 1 year)";
+                break;
+            default:
+                $searchSql .= "bno > 0 ";
+                break;
+        }
+
+        return $searchSql;
+    }
 
     // 게시물입력
     public function insertBoard($title, $writer, $content)
@@ -73,14 +173,6 @@ class BoardDAO
         $stmt->execute(array($bno));
 
         return $stmt->fetch();
-    }
-
-    // 전체 게시물 갯수 가져오기
-    public function getBoardCnt():int
-    {
-        $stmt = $this->getConnection();
-        $result = $stmt->query("SELECT COUNT(*) FROM board");
-        return $result->fetch()['0'];
     }
 
     // PrePareStatement객체 가져오기

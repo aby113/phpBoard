@@ -28,20 +28,29 @@ section{
 .selectBox{
     float:left;
 }
+#searchFrm{
+    display: inline-flex;
+}
+.searchBtn{
+    margin-left:10px;
+}
 </style>
 </head>
 <?php
+
 require "pageMaker.php";
 require "page.php";
 require "boardDAO.php";
-
 $cri = new Criteria();
 $boardDAO = new BoardDAO();
-if (isset($_GET["page"])) {
-    $cri->setPage($_GET["page"]);
-}
-$pageMaker = new PageMaker($cri, $boardDAO->getBoardCnt());
-$list = $boardDAO->getBoardList($cri);
+Criteria::setParam($cri);
+$pageMaker = new PageMaker($cri, $boardDAO->getBoardCnt($cri));
+$list = $boardDAO->getSearchBoard($cri);
+
+
+
+
+
 
 ?>
 <body>
@@ -67,13 +76,13 @@ $list = $boardDAO->getBoardList($cri);
                     <th>조회수</th>
                 </tr>
                 <?php
-foreach ($list as $vo) {
-    $bno = $vo["bno"];
-    $date = date('m-d H:i', strtotime($vo['regdate']));
-    $writer = $vo['writer'];
-    $title = $vo['title'];
-    $viewcnt = $vo['viewcnt'];
-    ?>
+if (!empty($list)) {
+    foreach ($list as $vo) {
+        $bno = $vo["bno"];
+        $date = date('m-d H:i', strtotime($vo['regdate']));
+        $writer = $vo['writer'];
+        $title = $vo['title'];
+        $viewcnt = $vo['viewcnt']; ?>
                 <tr>
                     <td><?=$bno?></td>
                     <td><?=$writer?></td>
@@ -82,6 +91,7 @@ foreach ($list as $vo) {
                     <td><?=$viewcnt?></td>
                 </tr>
                 <?php
+    }
 }
 ?>
             </table>
@@ -89,22 +99,23 @@ foreach ($list as $vo) {
             <!-- 글쓰기버튼 -->
             <div class="btn-area text-right">
                 <div class="selectBox">
-
-                    <select name="" id="">
-                        <option value="">전체기간</option>
-                        <option value="">1일</option>
-                        <option value="">1주</option>
-                        <option value="">1개월</option>
-                        <option value="">6개월</option>
-                        <option value="">1년</option>
-                    </select>
-                    <select name="" id="">
-                        <option value="">제목+내용</option>
-                        <option value="">제목</option>
-                        <option value="">작성자</option>
-                    </select>
-                    <input type="text" name="" id="">
-                    <button class="btn btn-primary searchBtn">검색</button>
+                    <form action="<?=$_SERVER['PHP_SELF']?>" id="searchFrm" method="get">
+                        <select name="period" id="">
+                            <option value="fd">전체기간</option>
+                            <option value="1d">1일</option>
+                            <option value="1w">1주</option>
+                            <option value="1m">1개월</option>
+                            <option value="6m">6개월</option>
+                            <option value="1y">1년</option>
+                        </select>
+                        <select name="searchType" id="">
+                            <option value="tc">제목+내용</option>
+                            <option value="t">제목</option>
+                            <option value="w">작성자</option>
+                        </select>
+                        <input type="text" name="keyword" id="">
+                    <button class="btn btn-primary searchBtn" type="button">검색</button>
+                    </form>
                 </div>
             <button type="button" class="btn btn-success writeBtn">글쓰기</button>
             </div>
@@ -123,6 +134,7 @@ if ($pageMaker->prev) {
                     </li>
                 <?php
 }
+
 for ($i = $pageMaker->startPage; $i <= $pageMaker->endPage; $i++) {
     ?>
 
@@ -156,6 +168,7 @@ if ($pageMaker->next) {
 <script>
 $(function(){
     var page = '<?= $cri->page ?>';
+    var searchQString = '<?= Criteria::mkSearchUrl($cri) ?>';
     $(".writeBtn").click(function(){
         location.href = "write.php";
 
@@ -164,16 +177,20 @@ $(function(){
     $(".titleLink").click(function (e) {
         e.preventDefault();
         var bno = $(this).attr("href");
-        location.href = "read.php?bno="+bno+"&page="+page;
+        location.href = "read.php"+searchQString+"&bno="+bno;
     });
 
     $(".page-link").click(function (e) { 
         e.preventDefault();
         var page = $(this).attr("href");
-        location.href = "list.php?page="+page;
+        searchQString=searchQString.replace("page="+'<?= $cri->page ?>', "page="+page);
+        location.href = "list.php"+searchQString;
     });
 
-
+    $(".searchBtn").click(function (e) { 
+        e.preventDefault();
+        $("#searchFrm").submit();
+    });
 
 
 });
