@@ -31,14 +31,16 @@ class PageMaker
         $this->endPage = (int) (ceil($this->cri->page / floatval($this->disPlayPageNum)) * $this->disPlayPageNum);
         $this->startPage = ($this->endPage - $this->disPlayPageNum) + 1;
         $tempPage = (int) ceil($this->totalCount / $this->cri->perPageNum);
+    
         if($this->endPage > $tempPage){
             $this->endPage = $tempPage;
+            $this->endPage = $tempPage == 0? 1:$tempPage;
         }
         $this->prev = $this->startPage == 1? false:true;
         $this->next = ($this->endPage * $this->cri->perPageNum) >= $this->totalCount? false:true;
     }
 
-    
+   
   
    
 }

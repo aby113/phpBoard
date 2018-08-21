@@ -24,13 +24,16 @@
 </head>
 <?php
 require "boardDAO.php";
+require "page.php";
 $dao = new BoardDAO();
 $vo = $dao->getBoard($_GET["bno"]);
 
 $title = $vo['title'];
 $content = $vo['content'];
 $writer = $vo['writer'];
-$page = $_GET["page"];
+$cri = new Criteria();
+Criteria::setParam($cri);
+
 ?>
 <body>
     <div class="container">
@@ -45,11 +48,11 @@ $page = $_GET["page"];
         <section>
                 <div class="form-group">
                     <label for="">제목</label>
-                    <input class="form-control" type="text" name="title" value=<?= $title ?> readonly="readonly">
+                    <input class="form-control" type="text" name="title" value='<?= $title ?>' readonly="readonly">
                 </div>
                 <div class="form-group">
                     <label for="">작성자</label>
-                    <input class="form-control" type="text" name="writer" value=<?=$writer?> readonly="readonly">
+                    <input class="form-control" type="text" name="writer" value='<?=$writer?>' readonly="readonly">
                 </div>
                 <div class="form-group">
                     <label for="" style="
@@ -64,15 +67,19 @@ $page = $_GET["page"];
 
         <form action="">
             <input type="hidden" name="bno" value=<?=$vo['bno']?>>
-            <input type="hidden" name="page" value=<?=$page?>>
+            <input type="hidden" name="page" value=<?=$cri->page?>>
+            <input type="hidden" name="period" value=<?=$cri->period?>>
+            <input type="hidden" name="searchType" value=<?=$cri->searchType?>>
+            <input type="hidden" name="keyword" value=<?=$cri->keyword?>>
         </form>
     </div>
     <script>
     $(document).ready(function () {
-        var page = '<?= $page ?>';
+        var page = '<?= $cri->page ?>';
+        var searchQString = '<?= Criteria::mkSearchUrl($cri) ?>';
         $(".listBtn").click(function (e) { 
             e.preventDefault();
-            location.href = "list.php?page="+page;
+            location.href = "list.php"+searchQString;
         });
 
         $(".rmBtn").click(function (e) { 
