@@ -9,6 +9,6 @@ $page = $_POST["page"];
 $dao = new BoardDAO();
 $dao->updateBoard($title, $content, $bno);
 $cri = new Criteria();
-Criteria::setPostParam($cri);
-header("Location:read.php" . Criteria::mkSearchUrl($url) . "&bno={$bno}");
+Criteria::setParam($cri);
+header("Location:read.php" . Criteria::mkSearchUrl($cri) . "&bno={$bno}");
 ?>

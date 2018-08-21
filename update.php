@@ -47,18 +47,18 @@ Criteria::setParam($cri);
 
         <section>
             <form action="updateDo.php" method="post">
-            <input type="hidden" name="bno" value=<?=$vo['bno']?>>
-            <input type="hidden" name="page" value=<?=$cri->page?>>
-            <input type="hidden" name="period" value=<?=$cri->period?>>
-            <input type="hidden" name="searchType" value=<?=$cri->searchType?>>
-            <input type="hidden" name="keyword" value=<?=$cri->keyword?>>
+            <input type="hidden" name="bno" value='<?=$vo['bno']?>'>
+            <input type="hidden" name="page" value='<?=$cri->page?>'>
+            <input type="hidden" name="period" value='<?=$cri->period?>'>
+            <input type="hidden" name="searchType" value='<?=$cri->searchType?>'>
+            <input type="hidden" name="keyword" value='<?=$cri->keyword?>'>
                 <div class="form-group">
                     <label for="">제목</label>
-                    <input class="form-control" type="text" name="title" value=<?=$vo['title']?>>
+                    <input class="form-control" type="text" name="title" value='<?=$vo['title']?>'>
                 </div>
                 <div class="form-group">
                     <label for="">작성자</label>
-                    <input class="form-control" type="text" name="writer" value=<?=$vo['writer']?> readonly="readonly">
+                    <input class="form-control" type="text" name="writer" value='<?=$vo['writer']?>' readonly="readonly">
                 </div>
                 <div class="form-group">
                         <label for="" style="
@@ -79,7 +79,7 @@ Criteria::setParam($cri);
     </div>
 <script>
 $(document).ready(function () {
-    var page = '<?=$page?>';
+    var page = '<?= $cri->page ?>';
     var searchQString = '<?=Criteria::mkSearchUrl($cri)?>';
         $(".listBtn").click(function (e) {
             e.preventDefault();

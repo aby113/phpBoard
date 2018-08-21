@@ -7,6 +7,7 @@ class Criteria
     public $period;
     public $searchType;
     public $keyword;
+    
 
     public function __construct()
     {
@@ -53,20 +54,7 @@ class Criteria
         }
     }
 
-       // 파라미터값이 존재하면 cri에 셋팅 page, keyword, period
-       public static function setPostParam(&$cri)
-       {
-           if (isset($_POST['page'])) {
-               $cri->setPage($_POST['page']);
-           }
-           if (isset($_POST['keyword'])) {
-               $cri->setSearchType($_POST['searchType'])->setKeyword($_POST['keyword']);
-           }
-   
-           if (isset($_POST['period'])) {
-               $cri->setPeriod($_POST['period']);
-           }
-       }
+  
 
 
     public static function mkSearchUrl(&$cri){
