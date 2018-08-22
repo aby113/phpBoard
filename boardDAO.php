@@ -2,7 +2,7 @@
 define('url', "mysql:host=localhost;dbname=web");
 define('user', "bm");
 define('pw', "bm");
-
+require "fileUtils.php";
 class BoardDAO
 {
 
@@ -138,24 +138,32 @@ class BoardDAO
     // 게시물입력
     public function insertBoard($title, $writer, $content)
     {
+        
+        $fileURL = FileUtils::uploadFile('file');
         $sql = "INSERT INTO board
-    (title, writer, content)
+    (title, writer, content, file_url)
     VALUES
-    (?,?,?)";
+    (?,?,?,?)";
 
         $stmt = $this->getPrePare($sql);
-        $stmt->execute(array($title, $writer, $content));
+        $stmt->execute(array($title, $writer, $content, $fileURL));
     }
 
     // 게시물수정
-    public function updateBoard($title, $content, $bno)
+    public function updateBoard($title, $content, $bno, $fileUrl)
     {
-        $sql = "UPDATE board SET
+    // 사용자가 새로 업로드를 했을경우 서버에 파일저장하고 url을 리턴함.
+        if ($fileUrl === null) {
+            $fileUrl = FileUtils::uploadFile('file');
+        }
+       $sql = "UPDATE board SET
                 title = ?,
-                content = ?
+                content = ?,
+                file_url = ?
             WHERE bno = ?";
         $stmt = $this->getPrePare($sql);
-        $stmt->execute(array($title, $content, $bno));
+        echo $fileUrl;
+        $stmt->execute(array($title, $content, $fileUrl, $bno));
     }
 
     // 게시물삭제
@@ -200,4 +208,8 @@ class BoardDAO
 
         return $db;
     }
+
+
+
+
 }

@@ -16,6 +16,13 @@
 
     <!-- 합쳐지고 최소화된 최신 자바스크립트 -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+<!-- include summernote css/js -->
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>
+
+
+
     <style>
         button {
             float: right;
@@ -31,6 +38,7 @@ $vo = $dao->getBoard($_GET["bno"]);
 $title = $vo['title'];
 $content = $vo['content'];
 $writer = $vo['writer'];
+$fileURL = $vo['file_url'];
 $cri = new Criteria();
 Criteria::setParam($cri);
 
@@ -57,7 +65,10 @@ Criteria::setParam($cri);
                 <div class="form-group">
                     <label for="" style="
                         vertical-align: top;">내용</label>
-                    <textarea class="form-control" name="content" id="" cols="30" rows="10" readonly="readonly"><?php echo $vo['content'] ?></textarea>
+                    <textarea class="form-control" name="content" id="summernote" cols="30" rows="10" readonly="readonly"><?php 
+                    echo "<img src='{$fileURL}'>\n";
+                    echo $vo['content']; ?>
+                    </textarea>
                 </div>
                 <button type="button" class="btn btn-danger rmBtn">글삭제</button>
                 <button type="button" class="btn btn-success modBtn">글수정</button>
@@ -77,6 +88,9 @@ Criteria::setParam($cri);
     $(document).ready(function () {
         var page = '<?= $cri->page ?>';
         var searchQString = '<?= Criteria::mkSearchUrl($cri) ?>';
+
+        $("#summernote").summernote('disable');
+
         $(".listBtn").click(function (e) { 
             e.preventDefault();
             location.href = "list.php"+searchQString;

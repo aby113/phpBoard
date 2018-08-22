@@ -19,7 +19,12 @@
 
     <!-- 합쳐지고 최소화된 최신 자바스크립트 -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-    <style>
+   
+<!-- include summernote css/js -->
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>
+   
+   <style>
    button{
        float: right;
    }
@@ -39,7 +44,7 @@
 
 
         <section>
-            <form action="writeDo.php" method="post">
+            <form action="writeDo.php" enctype="multipart/form-data" method="post">
                 <div class="form-group">
                     <label for="">제목</label>
                     <input class="form-control" type="text" name="title">
@@ -49,9 +54,13 @@
                     <input class="form-control" type="text" name="writer">
                 </div>
                 <div class="form-group">
+                    <label for="">파일</label>
+                    <input type="file" name="file" id="" class="form-control">
+                </div>
+                <div class="form-group">
                         <label for="" style="
                         vertical-align: top;">내용</label>
-                    <textarea class="form-control" name="content" id="" cols="30" rows="10"></textarea>
+                    <textarea class="form-control" name="content" id="summernote" cols="30" rows="10"></textarea>
                 </div>
              <button type="button" class="btn btn-danger canceil">취소</button>
              <button type="submit" class="btn btn-primary">저장</button>
@@ -65,6 +74,8 @@
     <script>
     $(function(){
         
+        $("#summernote").summernote();
+
         $(".canceil").click(function(){
             window.history.back();
         });

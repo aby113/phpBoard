@@ -19,6 +19,10 @@
 
     <!-- 합쳐지고 최소화된 최신 자바스크립트 -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    
+<!-- include summernote css/js -->
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
+<script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>
     <style>
    button{
        float: right;
@@ -46,12 +50,13 @@ Criteria::setParam($cri);
 
 
         <section>
-            <form action="updateDo.php" method="post">
+            <form action="updateDo.php" method="post" enctype="multipart/form-data">
             <input type="hidden" name="bno" value='<?=$vo['bno']?>'>
             <input type="hidden" name="page" value='<?=$cri->page?>'>
             <input type="hidden" name="period" value='<?=$cri->period?>'>
             <input type="hidden" name="searchType" value='<?=$cri->searchType?>'>
             <input type="hidden" name="keyword" value='<?=$cri->keyword?>'>
+            <input type="hidden" name="file_url" value="<?=$vo['file_url']?>">
                 <div class="form-group">
                     <label for="">제목</label>
                     <input class="form-control" type="text" name="title" value='<?=$vo['title']?>'>
@@ -61,18 +66,20 @@ Criteria::setParam($cri);
                     <input class="form-control" type="text" name="writer" value='<?=$vo['writer']?>' readonly="readonly">
                 </div>
                 <div class="form-group">
+                    <label for="">파일</label>
+                    <input type="file" name="file" id="fileInp" class="form-control">
+                </div>
+                <div class="form-group">
                         <label for="" style="
                         vertical-align: top;">내용</label>
-                    <textarea class="form-control" name="content" id="" cols="30" rows="10"><?=$vo['content']?></textarea>
+                     <textarea class="form-control" name="content" id="summernote" cols="30" rows="10" readonly="readonly"><?php 
+                    echo "<img class='fileImg' src='{$vo['file_url']}'>\n";
+                    echo $vo['content']; ?>
+                    </textarea>
                 </div>
              <button type="button" class="btn btn-danger listBtn">취소</button>
              <button type="submit" class="btn btn-primary modBtn">수정</button>
             </form>
-
-
-
-
-
 
         </section>
 
@@ -81,12 +88,18 @@ Criteria::setParam($cri);
 $(document).ready(function () {
     var page = '<?= $cri->page ?>';
     var searchQString = '<?=Criteria::mkSearchUrl($cri)?>';
+     $("#summernote").summernote();
         $(".listBtn").click(function (e) {
             e.preventDefault();
             location.href = "list.php"+searchQString;
         });
 
-
+        // 사용자가 업로드 파일을 선택했을 경우 히든태그, 이미지 태그  삭제
+        $("#fileInp").change(function (e) { 
+            e.preventDefault();
+            $(".fileImg").remove();
+            $("input[name=file_url]").remove();
+        });
 
 });
 
