@@ -8,14 +8,17 @@
     <title>게시판</title>
     <link rel="shortcut icon" type="image⁄x-icon" href="images/board.png">
     <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60=" crossorigin="anonymous"></script>
-    <!-- 합쳐지고 최소화된 최신 CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
 
-    <!-- 부가적인 테마 -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-    <!-- 합쳐지고 최소화된 최신 자바스크립트 -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+<!-- Popper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 
 <!-- include summernote css/js -->
 <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
@@ -27,9 +30,13 @@
         button {
             float: right;
         }
+        section{
+    margin-top: 100px;
+}
     </style>
 </head>
 <?php
+Session_start();
 require "boardDAO.php";
 require "page.php";
 $dao = new BoardDAO();
@@ -41,9 +48,17 @@ $writer = $vo['writer'];
 $fileURL = $vo['file_url'];
 $cri = new Criteria();
 Criteria::setParam($cri);
-
+$nickname = "";
+if (isset($_SESSION["login"])) {
+    $nickname = $_SESSION["login"]['0']['nickname'];
+}
 ?>
 <body>
+    <?php
+    include_once("include/header.php");
+    
+    
+    ?>
     <div class="container">
         <header>
             <div class="page-header">
@@ -70,9 +85,16 @@ Criteria::setParam($cri);
                     echo $vo['content']; ?>
                     </textarea>
                 </div>
+<?php
+if ($writer === $nickname) { // 본인이 쓴 글일 경우에만 글삭제 글수정버튼이 보임
+    ?>
                 <button type="button" class="btn btn-danger rmBtn">글삭제</button>
                 <button type="button" class="btn btn-success modBtn">글수정</button>
+<?php
+}
+?>
                 <button type="button" class="btn btn-primary listBtn">글목록</button>
+     
         </section>
 
 

@@ -31,7 +31,14 @@
     
     </style>
 </head>
+<?php
 
+Session_start();
+if(isset($_SESSION["login"])){
+    $nickname = $_SESSION["login"]['0']['nickname'];
+}
+
+?>
 
 <body>
     <div class="container">
@@ -51,7 +58,7 @@
                 </div>
                 <div class="form-group">
                     <label for="">작성자</label>
-                    <input class="form-control" type="text" name="writer">
+                    <input class="form-control" type="text" name="writer" value="<?=$nickname?>" readonly="readonly">
                 </div>
                 <div class="form-group">
                     <label for="">파일</label>

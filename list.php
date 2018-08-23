@@ -20,7 +20,7 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
 <style>
 section{
-    margin-top: 50px;
+    margin-top: 100px;
 }
 .btn-area{
     margin-bottom:10px;
@@ -41,19 +41,19 @@ section{
 require "pageMaker.php";
 require "page.php";
 require "boardDAO.php";
+if(isset($_POST["email"])){
+ //   echo "<script>alert('회원가입되었습니다.')</script>";
+}
 $cri = new Criteria();
 $boardDAO = new BoardDAO();
 Criteria::setParam($cri);
 $pageMaker = new PageMaker($cri, $boardDAO->getBoardCnt($cri));
 $list = $boardDAO->getSearchBoard($cri);
-
-
-
-
-
-
 ?>
 <body>
+<?php
+    include "include/header.php";
+?>
     <div class="container">
         <header></header>
         <section>
@@ -187,6 +187,7 @@ $(function(){
         location.href = "list.php"+searchQString;
     });
 
+// 검색
     $(".searchBtn").click(function (e) { 
         e.preventDefault();
         $("#searchFrm").submit();
